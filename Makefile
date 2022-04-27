@@ -1,6 +1,3 @@
-PROJECT=mcp23s17
-SOURCES=src/mcp23s17.c
-LIBRARY=static
 INCPATHS=
 LIBPATHS=
 LDFLAGS=
@@ -10,45 +7,31 @@ CC=gcc
 # ------------ MAGIC BEGINS HERE -------------
 
 # Automatic generation of some important lists
-OBJECTS=$(SOURCES:.c=.o)
-INCFLAGS=$(foreach TMP,$(INCPATHS),-I$(TMP))
-LIBFLAGS=$(foreach TMP,$(LIBPATHS),-L$(TMP))
+all: lib test
 
-# Set up the output file names for the different output types
-ifeq "$(LIBRARY)" "shared"
-    BINARY=lib$(PROJECT).so
-    LDFLAGS += -shared
-else ifeq "$(LIBRARY)" "static"
-    BINARY=lib$(PROJECT).a
-else
-    BINARY=$(PROJECT)
-endif
+lib: clean
+	cd src && make
+	
+test:
+	cd tst && make
+	
 
-all: $(SOURCES) $(BINARY)
 
-$(BINARY): $(OBJECTS)
-    # Link the object files, or archive into a static library
-    ifeq "$(LIBRARY)" "static"
-	ar rcs $(BINARY) $(OBJECTS)
-    else
-	$(CC) $(LIBFLAGS) $(OBJECTS) $(LDFLAGS) -o $@
-    endif
-
-.c.o:
-	$(CC) $(INCFLAGS) $(CFLAGS) -fPIC $< -o $@
 
 distclean: clean
-	rm -f $(BINARY)
+	cd src && make distclean
+	cd tst && make distclean
+	rm -f *.a
 
-example: example.c
-	gcc -o example example.c -Isrc/ -L. -lmcp23s17
-
-interrupt_example: interrupt_example.c
-	gcc -o interrupt_example interrupt_example.c -Isrc/ -L. -lmcp23s17
 
 clean:
-	rm -f $(OBJECTS)
+	cd src && make clean
+	cd tst && make clean
 
+uninstall: distclean
+	@test -f /usr/local/include/mcp23s17.h && rm /usr/local/include/mcp23s17.h || true
+	@test -f /usr/local/lib/libmcp23s17.a && rm /usr/local/lib/libmcp23s17.a || true
+	
 install: $(BINARY)
 	install src/mcp23s17.h /usr/local/include
 	install $(BINARY) /usr/local/lib
