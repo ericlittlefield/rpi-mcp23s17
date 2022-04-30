@@ -1,3 +1,7 @@
 .*
 !.gitignore
 .settings/*
+*.a
+*.o
+example
+interrupt_example

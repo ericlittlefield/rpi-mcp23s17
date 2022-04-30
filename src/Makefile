@@ -29,7 +29,9 @@ all: $(SOURCES) $(BINARY)
 $(BINARY): $(OBJECTS)
     # Link the object files, or archive into a static library
     ifeq "$(LIBRARY)" "static"
+	type ar
 	ar rcs $(BINARY) $(OBJECTS)
+	readelf -h $(BINARY) | grep 'Class\|File\|Machine'
     else
 	$(CC) $(LIBFLAGS) $(OBJECTS) $(LDFLAGS) -o $@
     endif
@@ -45,5 +47,5 @@ clean:
 	rm -f $(OBJECTS) *.a
 
 install: $(BINARY)
-	install src/mcp23s17.h /usr/local/include
-	install $(BINARY) /usr/local/lib
+	install mcp23s17.h ~/local/include
+	install libmcp23s17.a ~/local/lib/

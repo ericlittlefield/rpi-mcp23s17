@@ -12,7 +12,7 @@ all: lib test
 lib: clean
 	cd src && make
 	
-test:
+test: lib install
 	cd tst && make
 	
 
@@ -29,9 +29,12 @@ clean:
 	cd tst && make clean
 
 uninstall: distclean
-	@test -f /usr/local/include/mcp23s17.h && rm /usr/local/include/mcp23s17.h || true
-	@test -f /usr/local/lib/libmcp23s17.a && rm /usr/local/lib/libmcp23s17.a || true
+	@test -f ~/local/include/mcp23s17.h && rm ~/local/include/mcp23s17.h || true
+	@test -f ~/local/lib/libmcp23s17.a && rm ~/local/lib/libmcp23s17.a || true
 	
 install: $(BINARY)
-	install src/mcp23s17.h /usr/local/include
-	install $(BINARY) /usr/local/lib
+	
+	@test -f ~/local/include || install -d ~/local/include
+	@test -f ~/local/lib     || install -d ~/local/lib
+	cd src && make install
+	

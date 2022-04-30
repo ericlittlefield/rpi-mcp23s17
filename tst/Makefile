@@ -24,10 +24,10 @@ distclean: clean
 	rm -f $(BINARY) $(OBJECTS)
 
 example: example.c
-	gcc -o example example.c -I../src -L.. -lmcp23s17
+	gcc -o example example.c -I../src -L../src -lmcp23s17
 
 interrupt_example: interrupt_example.c
-	gcc -o interrupt_example interrupt_example.c -I../src -L.. -lmcp23s17
+	gcc -o interrupt_example interrupt_example.c -I../src -L../src -lmcp23s17
 
 clean:
 	rm -f $(OBJECTS) $(BINARY)
