@@ -1,11 +1,12 @@
 PROJECT=mcp23s17
 SOURCES=mcp23s17.c
 LIBRARY=static
-INCPATHS=
+INCPATHS= /usr/include
 LIBPATHS=
 LDFLAGS=
-CFLAGS=-c -Wall
-CC=gcc
+CFLAGS=-c -Wall -Og -g2 -O0
+CC=$(CROSS_COMPILE)gcc
+AR=$(CROSS_COMPILE)ar
 
 # ------------ MAGIC BEGINS HERE -------------
 
@@ -27,15 +28,8 @@ endif
 all: $(SOURCES) $(BINARY)
 
 $(BINARY): $(OBJECTS)
-    # Link the object files, or archive into a static library
-    ifeq "$(LIBRARY)" "static"
-	type ar
-	ar rcs $(BINARY) $(OBJECTS)
-	readelf -h $(BINARY) | grep 'Class\|File\|Machine'
-    else
-	$(CC) $(LIBFLAGS) $(OBJECTS) $(LDFLAGS) -o $@
-    endif
-
+	$(AR) rcs $(BINARY) $(OBJECTS)
+	
 .c.o:
 	$(CC) $(INCFLAGS) $(CFLAGS) -fPIC $< -o $@
 
@@ -47,5 +41,5 @@ clean:
 	rm -f $(OBJECTS) *.a
 
 install: $(BINARY)
-	install mcp23s17.h ~/local/include
-	install libmcp23s17.a ~/local/lib/
+	install mcp23s17.h $${HOME}/local/include
+	install libmcp23s17.a $${HOME}/local/lib/

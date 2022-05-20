@@ -24,6 +24,9 @@
 #define _MCP23S17_H
 
 #include <stdint.h>
+#include <sys/epoll.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,8 +66,8 @@ extern "C" {
 #define INT_MIRROR_OFF 0x00
 #define SEQOP_OFF 0x20  // incrementing address pointer
 #define SEQOP_ON 0x00
-#define DISSLW_ON 0x10  // slew rate
-#define DISSLW_OFF 0x00
+#define DISSLW_ON 0x00  // slew rate
+#define DISSLW_OFF 0x10
 #define HAEN_ON 0x08  // hardware addressing
 #define HAEN_OFF 0x00
 #define ODR_ON 0x04  // open drain for interupts
@@ -141,7 +144,23 @@ void mcp23s17_write_bit(uint8_t data,
  *  
  * @return int 0 on success
  */
-int mcp23s17_enable_interrupts();
+enum gpio_interrupt_edge
+{
+	rising_edge,
+	falling_edge,
+	both_edge
+};
+
+struct mcp23s17_interrupt
+{
+	size_t gpio_pin_no;
+	enum gpio_interrupt_edge edge;
+	int interrupt_fd;
+	int gpio_value_fd;
+	struct epoll_event control;
+};
+
+int mcp23s17_enable_interrupts(struct mcp23s17_interrupt *pdef);
 
 
 /**
@@ -150,7 +169,7 @@ int mcp23s17_enable_interrupts();
  *  
  * @return int 0 on success
  */
-int mcp23s17_disable_interrupts();
+int mcp23s17_disable_interrupts(struct mcp23s17_interrupt *pdef);
 
 
 /**
@@ -170,7 +189,8 @@ int mcp23s17_disable_interrupts();
  *         ready during the requested timeout milliseconds, or
  *         -1 on error.
  */
-int mcp23s17_wait_for_interrupt(int timeout);
+//int mcp23s17_wait_for_interrupt(struct mcp23s17_interrupt *pdef, int timeout, struct epoll_event *event);
+int mcp23s17_wait_for_interrupt(struct mcp23s17_interrupt *pdef, struct epoll_event *pEpoll_events, int timeout);
 
 
 #ifdef __cplusplus

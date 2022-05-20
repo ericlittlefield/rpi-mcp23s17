@@ -1,8 +1,8 @@
 
-INCPATHS=
-LIBPATHS=
+INCPATHS= ${HOME}/local/include
+LIBPATHS= ${HOME}/local/lib
 LDFLAGS=
-CFLAGS= -Wall -Og -g2 -O0
+CFLAGS=-c -Wall 
 CC=$(CROSS_COMPILE)gcc
 AR=$(CROSS_COMPILE)ar
 
@@ -12,7 +12,7 @@ AR=$(CROSS_COMPILE)ar
 OBJECTS=$(SOURCES:.c=.o)
 INCFLAGS=$(foreach TMP,$(INCPATHS),-I$(TMP))
 LIBFLAGS=$(foreach TMP,$(LIBPATHS),-L$(TMP))
-BINARY=example interrupt_example
+BINARY=mcp-console
 
 
 all: $(OBJECTS) $(BINARY)
@@ -24,14 +24,12 @@ all: $(OBJECTS) $(BINARY)
 distclean: clean
 	rm -f $(BINARY) $(OBJECTS)
 
-example: example.c
-	$(CC) $(CFLAGS) -o example example.c -I../src -L../src -lmcp23s17
-
-interrupt_example: interrupt_example.c
-	$(CC) $(CFLAGS) -o interrupt_example interrupt_example.c -I../src -L../src -lmcp23s17
+mcp-console: mcp-console.c
+	$(CC) -Og -g2 -O0 -o mcp-console mcp-console.c $(INCFLAGS) $(LIBFLAGS) -lmcp23s17
 
 clean:
 	rm -f $(OBJECTS) $(BINARY)
 
 install: $(BINARY)
+	install mcp-console $${HOME}/local/bin
 	

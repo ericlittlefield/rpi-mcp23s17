@@ -1,40 +1,39 @@
-INCPATHS=
+ARCH ?= arm64
+CROSS_COMPILE ?= ${CROSS_COMPILE}
 LIBPATHS=
 LDFLAGS=
-CFLAGS=-c -Wall
-CC=gcc
+#SYSROOT=$(SYSROOT_PATH)
+export
 
-# ------------ MAGIC BEGINS HERE -------------
-
-# Automatic generation of some important lists
 all: lib test
 
 lib: clean
-	cd src && make
+	cd src && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
 	
 test: lib install
-	cd tst && make
+	cd tst && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
 	
-
+tools: lib install
+	cd tools && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
 
 
 distclean: clean
-	cd src && make distclean
-	cd tst && make distclean
+	cd src && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) distclean
+	cd tst && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) distclean
 	rm -f *.a
 
 
 clean:
-	cd src && make clean
-	cd tst && make clean
+	cd src && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) clean
+	cd tst && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) clean
+	cd tools && make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) clean
 
 uninstall: distclean
-	@test -f ~/local/include/mcp23s17.h && rm ~/local/include/mcp23s17.h || true
-	@test -f ~/local/lib/libmcp23s17.a && rm ~/local/lib/libmcp23s17.a || true
-	
+	@test -f $${HOME}/local/include/mcp23s17.h && rm $${HOME}/local/include/mcp23s17.h || true
+	@test -f $${HOME}/local/lib/libmcp23s17.a && rm $${HOME}/local/lib/libmcp23s17.a || true
+
 install: $(BINARY)
-	
-	@test -f ~/local/include || install -d ~/local/include
-	@test -f ~/local/lib     || install -d ~/local/lib
-	cd src && make install
+	@test -f $${HOME}/local/include || install -d $${HOME}/local/include
+	@test -f $${HOME}/local/lib     || install -d $${HOME}/local/lib
+	cd src && make install ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
 	
